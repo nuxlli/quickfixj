@@ -53,11 +53,11 @@ import quickfix.field.Symbol;
 import quickfix.field.TargetCompID;
 import quickfix.field.Text;
 import quickfix.field.TimeInForce;
-import quickfix.fix42.ExecutionReport;
-import quickfix.fix42.MarketDataRequest;
-import quickfix.fix42.MarketDataSnapshotFullRefresh;
-import quickfix.fix42.NewOrderSingle;
-import quickfix.fix42.OrderCancelRequest;
+import quickfix.fix44.ExecutionReport;
+import quickfix.fix44.MarketDataRequest;
+import quickfix.fix44.MarketDataSnapshotFullRefresh;
+import quickfix.fix44.NewOrderSingle;
+import quickfix.fix44.OrderCancelRequest;
 
 import java.util.ArrayList;
 import quickfix.field.CxlRejResponseTo;
@@ -65,7 +65,7 @@ import quickfix.field.MDEntryPx;
 import quickfix.field.MDEntryType;
 import quickfix.field.MDReqID;
 import quickfix.field.OrdRejReason;
-import quickfix.fix42.OrderCancelReject;
+import quickfix.fix44.OrderCancelReject;
 
 public class Application extends MessageCracker implements quickfix.Application {
     private final OrderMatcher orderMatcher = new OrderMatcher();
@@ -118,10 +118,10 @@ public class Application extends MessageCracker implements quickfix.Application 
             String symbol, char side, String message) {
 
         ExecutionReport fixOrder = new ExecutionReport(new OrderID(clOrdId), new ExecID(generator
-                .genExecutionID()), new ExecTransType(ExecTransType.NEW), new ExecType(
-                ExecType.REJECTED), new OrdStatus(ExecType.REJECTED), new Symbol(symbol), new Side(
-                side), new LeavesQty(0), new CumQty(0), new AvgPx(0));
+                .genExecutionID()), new ExecType(ExecType.REJECTED), new OrdStatus(ExecType.REJECTED),
+                new Side(side), new LeavesQty(0), new CumQty(0), new AvgPx(0));
 
+        fixOrder.setString(Symbol.FIELD, symbol);
         fixOrder.setString(ClOrdID.FIELD, clOrdId);
         fixOrder.setString(Text.FIELD, message);
         fixOrder.setInt(OrdRejReason.FIELD, OrdRejReason.BROKER_EXCHANGE_OPTION);
@@ -166,11 +166,11 @@ public class Application extends MessageCracker implements quickfix.Application 
         String senderCompId = order.getTarget();
 
         ExecutionReport fixOrder = new ExecutionReport(new OrderID(order.getClientOrderId()),
-                new ExecID(generator.genExecutionID()), new ExecTransType(ExecTransType.NEW),
-                new ExecType(status), new OrdStatus(status), new Symbol(order.getSymbol()),
+                new ExecID(generator.genExecutionID()), new ExecType(status), new OrdStatus(status),
                 new Side(order.getSide()), new LeavesQty(order.getOpenQuantity()), new CumQty(order
                         .getExecutedQuantity()), new AvgPx(order.getAvgExecutedPrice()));
 
+        fixOrder.setString(Symbol.FIELD, order.getSymbol());
         fixOrder.setString(ClOrdID.FIELD, order.getClientOrderId());
         fixOrder.setDouble(OrderQty.FIELD, order.getQuantity());
 
